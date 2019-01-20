@@ -36,7 +36,9 @@ $(document).ready(function() {
             return;
         }
         
-        $('#result').slideUp(hasShownBefore ? 330 : 0);
+        $('#result').slideUp(hasShownBefore ? 330 : 0, function() {
+            $('#resultImage').attr('src', '');
+        });
         
         $('#convertButton').prop('disabled', true);
         $('#exampleButton').prop('disabled', true);
