@@ -141,10 +141,9 @@ app.listen(port, function() {
 
 
 function generateID() { // Generate a random 16-char hexadecimal ID
-	var output = '';
-	for (var i = 0; i < 16; i++) {
-		output += '0123456789abcdef'.charAt(Math.floor(Math.random() * 16));
-	}
-	
-	return output;
+    var output = '';
+    for (var i = 0; i < 16; i++) {
+        output += '0123456789abcdef'.charAt(Math.floor(Math.random() * 16));
+    }
+    return output;
 }
