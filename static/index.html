@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="Convert LaTeX math equations to PNG/JPG/SVG images">
+        <meta name="author" content="Joseph Rautenbach">
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <link rel="stylesheet" href="custom.css">
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+        <script src="latex2image-client.js"></script>
+        <title>LaTeX2Image – Convert LaTeX math equations to images</title>
+    </head>
+    <body>
+        <nav class="navbar navbar-light bg-light">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/"><img src="logo.svg"/></a>
+            </div>
+        </nav>
+        <div class="container">
+            <h3>Convert LaTeX math equations to PNG/JPG/SVG images</h3>
+            <p>LaTeX2Image allows LaTeX math equations to be exported directly to multiple image formats, and saved for use in other documents.</p>
+            <p>The full <a href="https://github.com/joeraut/latex2image-web">source code is available on GitHub</a>.
+                Behind the scenes, a Node.js app starts an isolated Docker container with a LaTeX installation for each request,
+                compiling the generated .tex file and converting it to an SVG vector image. If required, the SVG file is then converted to a raster image format.
+            </p>
+            <br>
+        </div>
+        <div class="container">
+            <div class="card">
+                <div class="card-body">
+                    <div class="form-group">
+                        <textarea class="form-control" id="latexInputTextArea" placeholder="Enter LaTeX math equation" rows="5"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-sm-6">
+                            <label for="outputFormatSelect">Image format</label>
+                            <select class="form-control" id="outputFormatSelect">
+                                <option>PNG</option>
+                                <option selected>SVG</option>
+                                <option>JPG</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-sm-6">
+                            <label for="outputScaleSelect">Scale</label>
+                            <select class="form-control" id="outputScaleSelect">
+                                <option>10%</option>
+                                <option>25%</option>
+                                <option>50%</option>
+                                <option>75%</option>
+                                <option>100%</option>
+                                <option selected>125%</option>
+                                <option>150%</option>
+                                <option>200%</option>
+                                <option>500%</option>
+                                <option>1000%</option>
+                            </select>
+                        </div>
+                    </div>
+                    <input type='submit' class="btn btn-primary" id="convertButton" value="Convert">
+                    &nbsp;&nbsp;
+                    <input type='submit' class="btn btn-info" id="exampleButton" value="Show Example">
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="container initiallyHidden" id="result">
+            <div class="card initiallyHidden" id="resultCard">
+                <div class="card-body">
+                    <img id="resultImage" />
+                    <br><br>
+                    <a href="#" class="btn btn-primary" role="button" id="downloadButton" target="_blank">Save Image</a>
+                </div>
+            </div>
+            <div class="alert alert-danger initiallyHidden" id="errorAlert"></div>
+        </div>
+        <br>
+        <div class="container">
+            <hr>
+            <footer>
+                <p>By <a href="https://joeraut.com">joeraut.com</a>, 2019 | <a href="https://github.com/joeraut/latex2image-web">source code</a></p>
+            </footer>
+        </div>
+    </body>
+</html>
