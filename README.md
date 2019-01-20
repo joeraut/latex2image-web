@@ -4,11 +4,11 @@
 
 A Node.js web application that allows LaTeX math equations to be entered and converted to PNG/JPG/SVG images.
 
-For each conversion, an isolated Docker container with a LaTeX installation is started; it compiles the generated .tex file and converts it to an SVG vector image. If required, the SVG file is then converted to a raster image format for PNG/JPG.
+For each conversion, an isolated Docker container with a LaTeX installation is started; it compiles the generated `.tex` file and converts it to an SVG vector image. If required, the SVG file is then converted to a raster image format for PNG/JPG.
 
 Bootstrap and jQuery are used in the web interface, with AJAX calls made to the conversion API endpoint.
 
-## Live Version
+## Live Demo
 
 The application is accessible at [https://latex2image.joeraut.com/](https://latex2image.joeraut.com/)
 
