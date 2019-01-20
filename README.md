@@ -8,6 +8,10 @@ For each conversion, an isolated Docker container with a LaTeX installation is s
 
 Bootstrap and jQuery are used in the web interface, with AJAX calls made to the conversion API endpoint.
 
+## Live Version
+
+The application is up and running at [https://latex2image.joeraut.com/](https://latex2image.joeraut.com/).
+
 ## Dependencies
 
 ### Operating system
@@ -48,7 +52,7 @@ npm install imagemin-cli -g
 
 ### Local Node.js packages
 
-After cloning or downloading this project, run
+After cloning or downloading this project, run:
 
 ```
 cd latex2image-web/
@@ -67,10 +71,18 @@ The web interface will be accessible at `http://127.0.0.1:3001` by default. The 
 
 Enter a LaTeX equation, for example `\frac{a}{b}`, and press Convert. The result will be displayed below the button.
 
+## Security
+
+LaTeX is powerful, with the reading and writing external files and executing commands possible. It was decided a new isolated Docker container be launched for every conversion.
+
+The container is only able to access the local `temp/<id>/` directory and has no network access.
+
+Additionally, the compilation process will be killed after 5 seconds if not complete; this is to safeguard against infinite loops and other troublesome LaTeX quirks.
+
 ## Notes
 
 * The directories `temp/` and `output/` will be generated automatically inside the `latex2image-web/` directory upon first launch.
-* `temp/` stores temporary `.tex`, `.dvi`, and `.svg` files during compilation, which are deleted upon completion of the conversion.
+* `temp/` stores temporary `.tex`, `.dvi`, and `.svg` files during compilation in an inner `temp/<id>/` directory, which is deleted upon completion of the conversion.
 * Final output images are stored in `output/`, and are never deleted.
 
 ## Authors
