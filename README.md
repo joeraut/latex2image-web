@@ -10,7 +10,7 @@ Bootstrap and jQuery are used in the web interface, with AJAX calls made to the 
 
 ## Live Version
 
-The application is up and running at [https://latex2image.joeraut.com/](https://latex2image.joeraut.com/).
+The application is accessible at [https://latex2image.joeraut.com/](https://latex2image.joeraut.com/)
 
 ## Dependencies
 
@@ -78,6 +78,15 @@ LaTeX is powerful, with the reading and writing external files and executing com
 The container is only able to access the local `temp/<id>/` directory and has no network access.
 
 Additionally, the compilation process will be killed after 5 seconds if not complete; this is to safeguard against infinite loops and other troublesome LaTeX quirks.
+
+## Internals
+
+Commands used:
+
+* `latex` - Converts `.tex` source file to `.dvi` intermediate
+* `dvisvgm` - Converts `.dvi` file to `.svg` vector image
+* `svgexport` - Converts `.svg` to `.png` or `.jpg` raster images
+* `imagemin` - Compresses `.png` and `.jpg` images
 
 ## Notes
 
