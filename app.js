@@ -8,7 +8,7 @@ var port = 3001;
 var staticDir = 'static/';
 var tempDirRoot = 'temp/';
 var outputDir = 'output/';
-var httpOutputURL = 'https://latex2image.joeraut.com/output/';
+var httpOutputURL = 'http://127.0.0.1/output/';
 
 // Command to compile .tex file to .dvi file. Timeout kills LaTeX after 5 seconds if held up
 var latexCMD = 'timeout 5 latex -interaction nonstopmode -halt-on-error equation.tex';
