@@ -1,6 +1,6 @@
 # LaTeX2Image
 
-![Image](screenshots/main.png)
+![Image](screenshots/homepage.png)
 
 A Node.js web application that allows LaTeX math equations to be entered and converted to PNG/JPG/SVG images.
 
