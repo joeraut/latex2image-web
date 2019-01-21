@@ -32,7 +32,7 @@ Pull the image:
 docker pull blang/latex:ubuntu
 ```
 
-### [Node.js](https://nodejs.org/en/download/)
+### Node.js
 
 Version 6 and onwards should suffice; I made use of v10.14.2.
 
@@ -73,7 +73,7 @@ Enter a LaTeX equation, for example `\frac{a}{b}`, and press Convert. The result
 
 ## Security
 
-LaTeX is powerful, with the reading and writing external files and executing commands possible. It was decided a new isolated Docker container be launched for every conversion.
+LaTeX is powerful, with the reading and writing of external files and execution of terminal commands possible. It was decided that a new isolated Docker container be launched for every conversion.
 
 The container is only able to access the local `temp/<id>/` directory and has no network access.
 
