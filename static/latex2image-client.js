@@ -10,7 +10,7 @@ $(document).ready(function() {
                 $('#resultCard').show();
                 $('#errorAlert').hide();
             } else {
-                $('#errorAlert').text(resultDataJSON.error);
+                $('#errorAlert').text(resultDataJSON.error || 'Invalid response received');
                 $('#errorAlert').show();
                 $('#resultCard').hide();
 
