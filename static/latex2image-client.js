@@ -1,3 +1,4 @@
+var sampleEquation = '\\frac{\\pi}{2} = \\int_{-1}^{1} \\sqrt{1-x^2}\\ dx';
 var hasShownBefore = false;
 
 $(document).ready(function() {
@@ -68,7 +69,7 @@ $(document).ready(function() {
 
     // Show and convert a sample equation
     $('#exampleButton').click(function() {
-        $('#latexInputTextArea').val('\\vec{F}=m \\frac{d \\vec{v}}{dt} + \\vec{v}\\frac{dm}{dt}');
+        $('#latexInputTextArea').val(sampleEquation);
         $('#convertButton').click();
     });
 });
