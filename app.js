@@ -78,7 +78,7 @@ app.post('/convert', function (req, res) {
                 
                 shell.mkdir(`${tempDirRoot}${id}`);
                 
-                var document = documentTemplate.replace('EQUATION', req.body.latexInput);
+                var document = documentTemplate.replace('EQUATION', req.body.latexInput.trim());
                 fs.writeFileSync(`${tempDirRoot}${id}/equation.tex`, document); // Write generated .tex file
                 
                 var result = {};
