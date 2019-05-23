@@ -46,9 +46,9 @@ var documentTemplate = `
 ${preamble}
 \\thispagestyle{empty}
 \\begin{document}
-\\[
+\\begin{align*}
 EQUATION
-\\]
+\\end{align*}
 \\end{document}`;
 
 // Create temp and output directories on first run
@@ -76,10 +76,15 @@ app.post('/convert', function (req, res) {
         if (validScales.includes(req.body.outputScale)) {
             if (validFormats.includes(req.body.outputFormat)) {
                 var id = generateID(); // Generate unique ID for filename
+
+                var eqnInput = req.body.latexInput.trim();
+                if (/\\\\(?!$)/.test(eqnInput) && !eqnInput.includes("&")) { // if any "\\" not at EOF, unless intentionally aligned with &
+                    eqnInput = '&' + eqnInput.replace(/\\\\(?!$)/g, "\\\\&"); // replace any "\\" not at EOF with "\\&", to enforce left alignment
+                }
                 
                 shell.mkdir(`${tempDirRoot}${id}`);
                 
-                var document = documentTemplate.replace('EQUATION', req.body.latexInput.trim());
+                var document = documentTemplate.replace('EQUATION', eqnInput);
                 fs.writeFileSync(`${tempDirRoot}${id}/equation.tex`, document); // Write generated .tex file
                 
                 var result = {};
