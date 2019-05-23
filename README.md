@@ -45,9 +45,7 @@ npm install
 
 ### Global Node.js packages for non-SVG images
 
-SVG files can be generated as-is, but for PNG and JPG export support the additional two global Node.js packages are required:
-
-#### [svgexport](https://www.npmjs.com/package/svgexport) and [imagemin-cli](https://www.npmjs.com/package/imagemin-cli)
+SVG files can be generated as-is, but for PNG and JPG export support two global Node.js packages [svgexport](https://www.npmjs.com/package/svgexport) and [imagemin-cli](https://www.npmjs.com/package/imagemin-cli) are required:
 
 ```
 npm install svgexport -g
