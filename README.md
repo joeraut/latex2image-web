@@ -36,7 +36,7 @@ docker pull blang/latex:ubuntu
 
 Version 6 and onwards should suffice; I made use of v10.14.2.
 
-After cloning or downloading this project, run:
+After cloning or downloading this project, run the following to install local dependencies from npm:
 
 ```
 cd latex2image-web/
