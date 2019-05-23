@@ -43,7 +43,7 @@ cd latex2image-web/
 npm install
 ```
 
-### (Optional) Global Node.js packages for non-SVG images
+### (Optional) Global Node.js packages for non-SVG image export
 
 SVG files can be generated as-is, but for PNG and JPG export support, two global Node.js packages [svgexport](https://www.npmjs.com/package/svgexport) and [imagemin-cli](https://www.npmjs.com/package/imagemin-cli) are required:
 
