@@ -36,27 +36,22 @@ docker pull blang/latex:ubuntu
 
 Version 6 and onwards should suffice; I made use of v10.14.2.
 
-### Global Node.js packages
-
-#### [svgexport](https://www.npmjs.com/package/svgexport)
-
-```
-npm install svgexport -g
-```
-
-#### [imagemin-cli](https://www.npmjs.com/package/imagemin-cli)
-
-```
-npm install imagemin-cli -g
-```
-
-### Local Node.js packages
-
 After cloning or downloading this project, run:
 
 ```
 cd latex2image-web/
 npm install
+```
+
+### Global Node.js packages for non-SVG images
+
+SVG files can be generated as-is, but for PNG and JPG export support the additional two global Node.js packages are required:
+
+#### [svgexport](https://www.npmjs.com/package/svgexport) and [imagemin-cli](https://www.npmjs.com/package/imagemin-cli)
+
+```
+npm install svgexport -g
+npm install imagemin-cli -g
 ```
 
 ## Usage
@@ -67,7 +62,7 @@ To run:
 node app.js
 ```
 
-The web interface will be accessible at `http://127.0.0.1:3001` by default. The port and HTTP URL can be modified inside `app.js`.
+The web interface will be accessible at `http://localhost:3001` by default. The port and HTTP URL can be modified inside `app.js`.
 
 Enter a LaTeX equation, for example `\frac{a}{b}`, and press Convert. The result will be displayed below the button.
 
