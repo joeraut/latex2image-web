@@ -109,16 +109,21 @@ app.post('/convert', function (req, res) {
                                 finalSvgToImageCMD += ' "svg {background: white}"';
                             }
                             shell.exec(finalSvgToImageCMD);
-                            
-                            // Compress the resultant image
-                            var finalImageMinCMD = imageMinCMD.replace('IN_FILE_NAME', `${tempDirRoot}${id}/equation.${fileFormat}`);
-                            finalImageMinCMD = finalImageMinCMD.replace('OUT_FILE_NAME', `${tempDirRoot}${id}/equation_compressed.${fileFormat}`);
-                            shell.exec(finalImageMinCMD);
-                            
-                            // Final image
-                            shell.cp(`${tempDirRoot}${id}/equation_compressed.${fileFormat}`, `${outputDir}img-${id}.${fileFormat}`);
-                            
-                            result.imageURL = `${httpOutputURL}img-${id}.${fileFormat}`;
+
+                            // Ensure conversion was successful; eg. fails if `svgexport` or `imagemin` is not installed
+                            if (fs.existsSync(`${tempDirRoot}${id}/equation.${fileFormat}`)) {
+                                // Compress the resultant image
+                                var finalImageMinCMD = imageMinCMD.replace('IN_FILE_NAME', `${tempDirRoot}${id}/equation.${fileFormat}`);
+                                finalImageMinCMD = finalImageMinCMD.replace('OUT_FILE_NAME', `${tempDirRoot}${id}/equation_compressed.${fileFormat}`);
+                                shell.exec(finalImageMinCMD);
+                                
+                                // Final image
+                                shell.cp(`${tempDirRoot}${id}/equation_compressed.${fileFormat}`, `${outputDir}img-${id}.${fileFormat}`);
+                                
+                                result.imageURL = `${httpOutputURL}img-${id}.${fileFormat}`;
+                            } else {
+                                result.error = `Error converting SVG file to ${fileFormat.toUpperCase()} image.`;
+                            }
                         }
                     } else {
                         result.error = 'Error converting LaTeX to image. Please ensure the input is valid.';
