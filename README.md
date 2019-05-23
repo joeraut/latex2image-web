@@ -10,7 +10,7 @@ Bootstrap and jQuery are used in the web interface, with AJAX calls made to the 
 
 ## Live Demo
 
-The application is accessible at [https://latex2image.joeraut.com/](https://latex2image.joeraut.com/)
+The application is accessible at [https://latex2image.joeraut.com](https://latex2image.joeraut.com).
 
 ## Requirements
 
@@ -45,7 +45,7 @@ npm install
 
 ### (Optional) Global Node.js packages for non-SVG image export
 
-SVG files can be generated as-is, but for PNG and JPG export support, two global Node.js packages [svgexport](https://www.npmjs.com/package/svgexport) and [imagemin-cli](https://www.npmjs.com/package/imagemin-cli) are required:
+SVG files can be generated as-is, but for PNG and JPG export support, the two global Node.js packages [svgexport](https://www.npmjs.com/package/svgexport) and [imagemin-cli](https://www.npmjs.com/package/imagemin-cli) are required:
 
 ```
 npm install svgexport -g
