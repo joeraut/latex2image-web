@@ -10,7 +10,7 @@ Bootstrap and jQuery are used in the web interface, with AJAX calls made to the 
 
 ## Live Demo
 
-The application is accessible at [https://latex2image.joeraut.com](https://latex2image.joeraut.com).
+The application is accessible at [https://latex2image.joeraut.com](https://latex2image.joeraut.com)
 
 ## Requirements
 
