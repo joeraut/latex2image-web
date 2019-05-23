@@ -11,7 +11,7 @@ var outputDir = 'output/';
 var httpOutputURL = 'output/';
 
 // Command to compile .tex file to .dvi file. Timeout kills LaTeX after 5 seconds if held up
-var latexCMD = 'timeout 5 latex -interaction nonstopmode -halt-on-error equation.tex';
+var latexCMD = 'timeout 5 latex -interaction nonstopmode -halt-on-error --no-shell-escape equation.tex';
 
 // Command to convert .dvi to .svg file
 var dvisvgmCMD = 'dvisvgm --no-fonts --scale=OUTPUT_SCALE --exact equation.dvi';
@@ -38,6 +38,7 @@ var preamble = `
 \\usepackage{amsmath}
 \\usepackage{amssymb}
 \\usepackage{amsfonts}
+\\usepackage[utf8]{inputenc}
 `;
 
 var documentTemplate = `
