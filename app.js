@@ -1,47 +1,46 @@
-var fs = require('fs');
-var shell = require('shelljs');
+const fs = require('fs');
+const shell = require('shelljs');
+const express = require('express');
 
-var express = require('express');
+const port = 3001;
 
-var port = 3001;
-
-var staticDir = 'static/';
-var tempDirRoot = 'temp/';
-var outputDir = 'output/';
-var httpOutputURL = 'output/';
-
-// Command to compile .tex file to .dvi file. Timeout kills LaTeX after 5 seconds if held up
-var latexCMD = 'timeout 5 latex -interaction nonstopmode -halt-on-error --no-shell-escape equation.tex';
-
-// Command to convert .dvi to .svg file
-var dvisvgmCMD = 'dvisvgm --no-fonts --scale=OUTPUT_SCALE --exact equation.dvi';
-
-var dockerImageName = 'blang/latex:ubuntu'; // https://github.com/blang/latex-docker
-
-// Command to run the above commands in a new Docker container (with LaTeX preinstalled)
-var dockerCMD = `cd TEMP_DIR_NAME && exec docker run --rm -i --user="$(id -u):$(id -g)" --net=none -v "$PWD":/data "${dockerImageName}" /bin/sh -c "${latexCMD} && ${dvisvgmCMD}"`;
-
-// Commands to convert .svg to .png/.jpg and compress
-var svgToImageCMD = 'svgexport SVG_FILE_NAME OUT_FILE_NAME';
-var imageMinCMD = 'imagemin IN_FILE_NAME > OUT_FILE_NAME';
+const staticDir = 'static/';
+const tempDirRoot = 'temp/';
+const outputDir = 'output/';
+const httpOutputURL = 'output/';
 
 // Checklist of valid formats and scales, to verify form values are correct
-var validFormats = ['SVG', 'PNG', 'JPG'];
-var validScales = ['10%', '25%', '50%', '75%', '100%', '125%', '150%', '200%', '500%', '1000%'];
+const validFormats = ['SVG', 'PNG', 'JPG'];
+const validScales = ['10%', '25%', '50%', '75%', '100%', '125%', '150%', '200%', '500%', '1000%'];
 // Percentage scales mapped to floating point values used in arguments
-var validScalesInternal = ['0.1', '0.25', '0.5', '0.75', '1.0', '1.25', '1.5', '2.0', '5.0', '10.0'];
+const validScalesInternal = ['0.1', '0.25', '0.5', '0.75', '1.0', '1.25', '1.5', '2.0', '5.0', '10.0'];
 
-var fontSize = 12;
+// Command to compile .tex file to .dvi file. Timeout kills LaTeX after 5 seconds if held up
+const latexCMD = 'timeout 5 latex -interaction nonstopmode -halt-on-error --no-shell-escape equation.tex';
+
+// Command to convert .dvi to .svg file
+const dvisvgmCMD = 'dvisvgm --no-fonts --scale=OUTPUT_SCALE --exact equation.dvi';
+
+const dockerImageName = 'blang/latex:ubuntu'; // https://github.com/blang/latex-docker
+
+// Command to run the above commands in a new Docker container (with LaTeX preinstalled)
+const dockerCMD = `cd TEMP_DIR_NAME && exec docker run --rm -i --user="$(id -u):$(id -g)" --net=none -v "$PWD":/data "${dockerImageName}" /bin/sh -c "${latexCMD} && ${dvisvgmCMD}"`;
+
+// Commands to convert .svg to .png/.jpg and compress
+const svgToImageCMD = 'svgexport SVG_FILE_NAME OUT_FILE_NAME';
+const imageMinCMD = 'imagemin IN_FILE_NAME > OUT_FILE_NAME';
+
+const fontSize = 12;
 
 // LaTeX document template
-var preamble = `
+const preamble = `
 \\usepackage{amsmath}
 \\usepackage{amssymb}
 \\usepackage{amsfonts}
 \\usepackage[utf8]{inputenc}
 `;
 
-var documentTemplate = `
+const documentTemplate = `
 \\documentclass[${fontSize}pt]{article}
 ${preamble}
 \\thispagestyle{empty}
@@ -59,9 +58,9 @@ if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir);
 }
 
-var app = express();
+const app = express();
 
-var bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -75,26 +74,26 @@ app.post('/convert', function (req, res) {
     if (req.body.latexInput) {
         if (validScales.includes(req.body.outputScale)) {
             if (validFormats.includes(req.body.outputFormat)) {
-                var id = generateID(); // Generate unique ID for filename
+                const id = generateID(); // Generate unique ID for filename
 
-                var eqnInput = req.body.latexInput.trim();
+                let eqnInput = req.body.latexInput.trim();
                 if (/\\\\(?!$)/.test(eqnInput) && !eqnInput.includes("&")) { // if any "\\" not at EOF, unless intentionally aligned with &
                     eqnInput = '&' + eqnInput.replace(/\\\\(?!$)/g, "\\\\&"); // replace any "\\" not at EOF with "\\&", to enforce left alignment
                 }
                 
                 shell.mkdir(`${tempDirRoot}${id}`);
                 
-                var document = documentTemplate.replace('EQUATION', eqnInput);
+                const document = documentTemplate.replace('EQUATION', eqnInput);
                 fs.writeFileSync(`${tempDirRoot}${id}/equation.tex`, document); // Write generated .tex file
                 
-                var result = {};
+                let result = {};
                 
-                var finalDockerCMD = dockerCMD.replace('TEMP_DIR_NAME', `${tempDirRoot}${id}`);
+                let finalDockerCMD = dockerCMD.replace('TEMP_DIR_NAME', `${tempDirRoot}${id}`);
                 finalDockerCMD = finalDockerCMD.replace('OUTPUT_SCALE', validScalesInternal[validScales.indexOf(req.body.outputScale)]);
                 
-                var fileFormat = req.body.outputFormat.toLowerCase();
+                const fileFormat = req.body.outputFormat.toLowerCase();
                 
-                // Asynchronously compile and render the LaTeX to svg
+                // Asynchronously compile and render the LaTeX to an image
                 shell.exec(finalDockerCMD, {async: true}, function() {
                     if (fs.existsSync(`${tempDirRoot}${id}/equation.svg`)) {
                         if (fileFormat === 'svg') { // Converting to SVG, no further processing required
@@ -103,7 +102,7 @@ app.post('/convert', function (req, res) {
                         } else {
                             
                             // Convert svg to png/jpg
-                            var finalSvgToImageCMD = svgToImageCMD.replace('SVG_FILE_NAME', `${tempDirRoot}${id}/equation.svg`);
+                            let finalSvgToImageCMD = svgToImageCMD.replace('SVG_FILE_NAME', `${tempDirRoot}${id}/equation.svg`);
                             finalSvgToImageCMD = finalSvgToImageCMD.replace('OUT_FILE_NAME', `${tempDirRoot}${id}/equation.${fileFormat}`);
                             if (fileFormat === 'jpg') { // Add a white background for jpg images
                                 finalSvgToImageCMD += ' "svg {background: white}"';
@@ -113,7 +112,7 @@ app.post('/convert', function (req, res) {
                             // Ensure conversion was successful; eg. fails if `svgexport` or `imagemin` is not installed
                             if (fs.existsSync(`${tempDirRoot}${id}/equation.${fileFormat}`)) {
                                 // Compress the resultant image
-                                var finalImageMinCMD = imageMinCMD.replace('IN_FILE_NAME', `${tempDirRoot}${id}/equation.${fileFormat}`);
+                                let finalImageMinCMD = imageMinCMD.replace('IN_FILE_NAME', `${tempDirRoot}${id}/equation.${fileFormat}`);
                                 finalImageMinCMD = finalImageMinCMD.replace('OUT_FILE_NAME', `${tempDirRoot}${id}/equation_compressed.${fileFormat}`);
                                 shell.exec(finalImageMinCMD);
                                 
@@ -152,8 +151,8 @@ app.listen(port, function() {
 
 
 function generateID() { // Generate a random 16-char hexadecimal ID
-    var output = '';
-    for (var i = 0; i < 16; i++) {
+    let output = '';
+    for (let i = 0; i < 16; i++) {
         output += '0123456789abcdef'.charAt(Math.floor(Math.random() * 16));
     }
     return output;
