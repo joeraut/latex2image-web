@@ -43,15 +43,6 @@ cd latex2image-web/
 npm install
 ```
 
-### (Optional) Global Node.js packages for non-SVG image export
-
-SVG files can be generated as-is, but for PNG and JPG export support, the two global Node.js packages [svgexport](https://www.npmjs.com/package/svgexport) and [imagemin-cli](https://www.npmjs.com/package/imagemin-cli) are required:
-
-```
-npm install svgexport -g
-npm install imagemin-cli -g
-```
-
 ## Usage
 
 To run:
@@ -74,12 +65,12 @@ Additionally, the compilation process will be killed after 5 seconds if not comp
 
 ## Internals
 
-Commands used:
+### Commands used:
 
 * `latex` - Converts `.tex` source file to `.dvi` intermediate
 * `dvisvgm` - Converts `.dvi` file to `.svg` vector image
-* `svgexport` - Converts `.svg` to `.png` or `.jpg` raster images
-* `imagemin` - Compresses `.png` and `.jpg` images
+
+We use [sharp](https://www.npmjs.com/package/sharp) to convert the SVG file to PNG and JPG images where required.
 
 ## Notes
 
