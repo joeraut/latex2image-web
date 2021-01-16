@@ -4,14 +4,14 @@
         <!-- Required meta tags -->
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta name="description" content="Convert LaTeX math equations to PNG/JPG/SVG images">
+        <meta name="description" content="Convert LaTeX math equations to PNG/JPG/SVG images, with transparent backgrounds and perfect LaTeX rendering">
         <meta name="author" content="Joseph Rautenbach">
         <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
         <link rel="stylesheet" href="custom.css">
         <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
         <script src="latex2image-client.js"></script>
-        <title>LaTeX2Image – Convert LaTeX math equations to images</title>
+        <title>LaTeX to image converter</title>
     </head>
     <body>
         <nav class="navbar navbar-light bg-light">
@@ -21,12 +21,9 @@
         </nav>
         <div class="container">
             <h3>Convert LaTeX math equations to PNG/JPG/SVG images</h3>
-            <p>LaTeX2Image allows LaTeX math equations to be exported directly to multiple image formats, and saved for use in other documents.</p>
-            <p>The full <a href="https://github.com/joeraut/latex2image-web">source code is available on GitHub</a>.
-                Behind the scenes, a Node.js app starts an isolated Docker container with a LaTeX installation for each request,
-                compiling the generated .tex file and converting it to an SVG vector image. If required, the SVG file is then converted to a raster image format.
+            <p>LaTeX2Image allows LaTeX math equations to be exported directly to multiple image formats, and saved for use in other documents.<br>
+                Enter in a LaTeX math equation and click &ldquo;Convert&rdquo;. For a sample expression, click &ldquo;Show Example&rdquo;. <a href="https://github.com/joeraut/latex2image-web" target="_blank">Source code available on GitHub</a>.
             </p>
-            <br>
         </div>
         <div class="container">
             <div class="card">
@@ -38,8 +35,8 @@
                         <div class="form-group col-sm-6">
                             <label for="outputFormatSelect">Image format</label>
                             <select class="form-control" id="outputFormatSelect">
-                                <option>PNG</option>
-                                <option selected>SVG</option>
+                                <option selected>PNG</option>
+                                <option>SVG</option>
                                 <option>JPG</option>
                             </select>
                         </div>
@@ -71,7 +68,7 @@
                 <div class="card-body">
                     <img id="resultImage" />
                     <br><br>
-                    <a href="#" class="btn btn-primary" role="button" id="downloadButton" target="_blank">Save Image</a>
+                    <a href="#" class="btn btn-primary" role="button" id="downloadButton" download>Save Image</a>
                 </div>
             </div>
             <div class="alert alert-danger initiallyHidden" id="errorAlert"></div>
@@ -80,7 +77,7 @@
         <div class="container">
             <hr>
             <footer>
-                <p>By <a href="https://joeraut.com">joeraut.com</a>, 2019 | <a href="https://github.com/joeraut/latex2image-web">source code</a></p>
+                <p>By <a href="https://joeraut.com" target="_blank">joeraut.com</a> | <a href="https://github.com/joeraut/latex2image-web" target="_blank">source code</a></p>
             </footer>
         </div>
     </body>
