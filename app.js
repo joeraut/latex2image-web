@@ -14,12 +14,22 @@ const tempDir = 'temp';
 const outputDir = 'output';
 const httpOutputDir = 'output';
 
-// Checklist of valid formats and scales, to verify form values are correct
+// Checklist of valid formats from the frontend, to verify form values are correct
 const validFormats = ['SVG', 'PNG', 'JPG'];
-const validScales = ['10%', '25%', '50%', '75%', '100%', '125%', '150%', '200%', '500%', '1000%'];
 
-// Percentage scales mapped to floating point values used in arguments
-const validScalesInternal = ['0.1', '0.25', '0.5', '0.75', '1.0', '1.25', '1.5', '2.0', '5.0', '10.0'];
+// Maps scales received from the frontend into values appropriate for LaTeX
+const scaleMap = {
+  '10%': '0.1',
+  '25%': '0.25',
+  '50%': '0.5',
+  '75%': '0.75',
+  '100%': '1.0',
+  '125%': '1.25',
+  '150%': '1.5',
+  '200%': '2.0',
+  '500%': '5.0',
+  '1000%': '10.0'
+};
 
 // Unsupported commands we will error on
 const unsupportedCommands = ['\\usepackage', '\\input', '\\include', '\\write18', '\\immediate', '\\verbatiminput'];
@@ -51,7 +61,7 @@ conversionRouter.post('/convert', async (req, res) => {
       return;
     }
 
-    if (!validScales.includes(req.body.outputScale)) {
+    if (!scaleMap[req.body.outputScale]) {
       res.end(JSON.stringify({ error: 'Invalid scale.' }));
       return;
     }
@@ -67,16 +77,16 @@ conversionRouter.post('/convert', async (req, res) => {
       return;
     }
 
-    const eqnInput = req.body.latexInput.trim();
+    const equation = req.body.latexInput.trim();
     const fileFormat = req.body.outputFormat.toLowerCase();
-    const outputScale = req.body.outputScale;
+    const outputScale = scaleMap[req.body.outputScale];
 
     // Generate and write the .tex file
     await fsPromises.mkdir(`${tempDir}/${id}`);
-    await fsPromises.writeFile(`${tempDir}/${id}/equation.tex`, getLatexTemplate(eqnInput));
+    await fsPromises.writeFile(`${tempDir}/${id}/equation.tex`, getLatexTemplate(equation));
 
     // Run the LaTeX compiler and generate a .svg file
-    await execAsync(getDockerCommand(id, validScalesInternal[validScales.indexOf(outputScale)]));
+    await execAsync(getDockerCommand(id, outputScale));
 
     const inputSvgFileName = `${tempDir}/${id}/equation.svg`;
     const outputFileName = `${outputDir}/img-${id}.${fileFormat}`;
