@@ -9,53 +9,20 @@ const Promise = require('bluebird');
 
 const port = 3001;
 
-const staticDir = 'static/';
-const tempDirRoot = 'temp/';
-const outputDir = 'output/';
-const httpOutputURL = 'output/';
+const staticDir = 'static';
+const tempDir = 'temp';
+const outputDir = 'output';
+const httpOutputDir = 'output';
 
 // Checklist of valid formats and scales, to verify form values are correct
 const validFormats = ['SVG', 'PNG', 'JPG'];
 const validScales = ['10%', '25%', '50%', '75%', '100%', '125%', '150%', '200%', '500%', '1000%'];
+
 // Percentage scales mapped to floating point values used in arguments
 const validScalesInternal = ['0.1', '0.25', '0.5', '0.75', '1.0', '1.25', '1.5', '2.0', '5.0', '10.0'];
 
-// Command to compile .tex file to .dvi file. Timeout kills it after 5 seconds if held up
-const latexCMD = 'timeout 5 latex -interaction nonstopmode -halt-on-error --no-shell-escape equation.tex';
-
-// Command to convert .dvi to .svg file. Timeout kills it after 5 seconds if held up
-const dvisvgmCMD = 'timeout 5 dvisvgm --no-fonts --scale=OUTPUT_SCALE --exact equation.dvi';
-
-const dockerImageName = 'blang/latex:ubuntu'; // https://github.com/blang/latex-docker
-
-// Command to run the above commands in a new Docker container (with LaTeX preinstalled)
-const dockerCMD = `cd TEMP_DIR_NAME && exec docker run --rm -i --user="$(id -u):$(id -g)" --net=none -v "$PWD":/data "${dockerImageName}" /bin/sh -c "${latexCMD} && ${dvisvgmCMD}"`;
-
-// LaTeX document template
-const preamble = `
-\\usepackage{amsmath}
-\\usepackage{amssymb}
-\\usepackage{amsfonts}
-\\usepackage[utf8]{inputenc}
-`;
-
-const documentTemplate = `
-\\documentclass[12pt]{article}
-${preamble}
-\\thispagestyle{empty}
-\\begin{document}
-\\begin{align*}
-EQUATION
-\\end{align*}
-\\end{document}`;
-
-// Create temp and output directories on first run
-if (!fs.existsSync(tempDirRoot)) {
-  fs.mkdirSync(tempDirRoot);
-}
-if (!fs.existsSync(outputDir)) {
-  fs.mkdirSync(outputDir);
-}
+// Unsupported commands we will error on
+const unsupportedCommands = ['\\usepackage', '\\input', '\\include', '\\write18', '\\immediate', '\\verbatiminput'];
 
 const app = express();
 
@@ -94,23 +61,25 @@ conversionRouter.post('/convert', async (req, res) => {
       return;
     }
 
+    const unsupportedCommandsPresent = unsupportedCommands.filter(cmd => req.body.latexInput.includes(cmd));
+    if (unsupportedCommandsPresent.length > 0) {
+      res.end(JSON.stringify({ error: `Unsupported command(s) found: ${unsupportedCommandsPresent.join(', ')}. Please remove them and try again.` }));
+      return;
+    }
+
     const eqnInput = req.body.latexInput.trim();
     const fileFormat = req.body.outputFormat.toLowerCase();
     const outputScale = req.body.outputScale;
 
     // Generate and write the .tex file
-    const document = documentTemplate.replace('EQUATION', eqnInput);
-    await fsPromises.mkdir(`${tempDirRoot}${id}`);
-    await fsPromises.writeFile(`${tempDirRoot}${id}/equation.tex`, document);
+    await fsPromises.mkdir(`${tempDir}/${id}`);
+    await fsPromises.writeFile(`${tempDir}/${id}/equation.tex`, getLatexTemplate(eqnInput));
 
     // Run the LaTeX compiler and generate a .svg file
-    const finalDockerCMD = dockerCMD
-      .replace('TEMP_DIR_NAME', `${tempDirRoot}${id}`)
-      .replace('OUTPUT_SCALE', validScalesInternal[validScales.indexOf(outputScale)]);
-    await execAsync(finalDockerCMD);
+    await execAsync(getDockerCommand(id, validScalesInternal[validScales.indexOf(outputScale)]));
 
-    const inputSvgFileName = `${tempDirRoot}${id}/equation.svg`;
-    const outputFileName = `${outputDir}img-${id}.${fileFormat}`;
+    const inputSvgFileName = `${tempDir}/${id}/equation.svg`;
+    const outputFileName = `${outputDir}/img-${id}.${fileFormat}`;
 
     // Return the SVG image, no further processing required
     if (fileFormat === 'svg') {
@@ -130,8 +99,9 @@ conversionRouter.post('/convert', async (req, res) => {
     }
 
     await cleanupTempFilesAsync(id);
-    res.end(JSON.stringify({ imageURL: `${httpOutputURL}img-${id}.${fileFormat}` }));
+    res.end(JSON.stringify({ imageURL: `${httpOutputDir}/img-${id}.${fileFormat}` }));
 
+  // An exception occurred somewhere, return an error
   } catch (e) {
     console.error(e);
     await cleanupTempFilesAsync(id);
@@ -139,14 +109,61 @@ conversionRouter.post('/convert', async (req, res) => {
   }
 });
 
-// Start the server
-app.listen(port, () => console.log(`Latex2Image listening at http://localhost:${port}/`));
+// Create temp and output directories if they don't exist yet
+if (!fs.existsSync(tempDir)) {
+  fs.mkdirSync(tempDir);
+}
+if (!fs.existsSync(outputDir)) {
+  fs.mkdirSync(outputDir);
+}
 
-// Helper functions
+// Start the server
+app.listen(port, () => console.log(`Latex2Image listening at http://localhost:${port}`));
+
+//// Helper functions
+
+// Get the LaTeX document template for the requested equation
+function getLatexTemplate(equation) {
+  return `
+    \\documentclass[12pt]{article}
+    \\usepackage{amsmath}
+    \\usepackage{amssymb}
+    \\usepackage{amsfonts}
+    \\usepackage[utf8]{inputenc}
+    \\thispagestyle{empty}
+    \\begin{document}
+    \\begin{align*}
+    ${equation}
+    \\end{align*}
+    \\end{document}`;
+}
+
+// Get the final command responsible for launching the Docker container and generating a svg file
+function getDockerCommand(id, output_scale) {
+  // Commands to run within the container
+  const containerCmds = `
+    # Prevent LaTeX from reading/writing files in parent directories
+    echo 'openout_any = p\nopenin_any = p' > /tmp/texmf.cnf
+    export TEXMFCNF='/tmp:'
+
+    # Compile .tex file to .dvi file. Timeout kills it after 5 seconds if held up
+    timeout 5 latex -no-shell-escape -interaction=nonstopmode -halt-on-error equation.tex
+
+    # Convert .dvi to .svg file. Timeout kills it after 5 seconds if held up
+    timeout 5 dvisvgm --no-fonts --scale=${output_scale} --exact equation.dvi`;
+
+  // Start the container in the appropriate directory and run commands within it.
+  // Files in this directory will be accessible under /data within the container.
+  return `
+    cd ${tempDir}/${id}
+    docker run --rm -i --user="$(id -u):$(id -g)" \
+        --net=none -v "$PWD":/data "blang/latex:ubuntu" \
+        /bin/bash -c "${containerCmds}"`;
+}
 
 // Deletes temporary files created during a conversion request
 function cleanupTempFilesAsync(id) {
-  return fsPromises.rmdir(`${tempDirRoot}${id}`, { recursive: true });
+  return fsPromises.rmdir(`${tempDir}/${id}`, { recursive: true });
 }
 
 // Execute a shell command
