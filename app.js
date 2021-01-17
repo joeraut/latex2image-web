@@ -139,6 +139,7 @@ function getLatexTemplate(equation) {
     \\usepackage{amsmath}
     \\usepackage{amssymb}
     \\usepackage{amsfonts}
+    \\usepackage{xcolor}
     \\usepackage[utf8]{inputenc}
     \\thispagestyle{empty}
     \\begin{document}
