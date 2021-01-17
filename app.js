@@ -142,9 +142,7 @@ function getLatexTemplate(equation) {
     \\usepackage[utf8]{inputenc}
     \\thispagestyle{empty}
     \\begin{document}
-    \\begin{align*}
     ${equation}
-    \\end{align*}
     \\end{document}`;
 }
 

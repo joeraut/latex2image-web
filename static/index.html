@@ -5,9 +5,8 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <meta name="description" content="Convert LaTeX math equations to PNG/JPG/SVG images, with transparent backgrounds and perfect LaTeX rendering">
-        <meta name="author" content="Joseph Rautenbach">
         <!-- Bootstrap CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
         <link rel="stylesheet" href="custom.css">
         <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
         <script src="latex2image-client.js"></script>
@@ -27,39 +26,58 @@
         </div>
         <div class="container">
             <div class="card">
-                <div class="card-body">
-                    <div class="form-group">
-                        <textarea class="form-control" id="latexInputTextArea" placeholder="Enter LaTeX math equation" rows="5"></textarea>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-sm-6">
-                            <label for="outputFormatSelect">Image format</label>
-                            <select class="form-control" id="outputFormatSelect">
-                                <option selected>PNG</option>
-                                <option>SVG</option>
-                                <option>JPG</option>
-                            </select>
+                <form>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <textarea class="form-control" id="latexInputTextArea" placeholder="Enter LaTeX math equation" rows="5"></textarea>
                         </div>
-                        <div class="form-group col-sm-6">
-                            <label for="outputScaleSelect">Scale</label>
-                            <select class="form-control" id="outputScaleSelect">
-                                <option>10%</option>
-                                <option>25%</option>
-                                <option>50%</option>
-                                <option>75%</option>
-                                <option>100%</option>
-                                <option selected>125%</option>
-                                <option>150%</option>
-                                <option>200%</option>
-                                <option>500%</option>
-                                <option>1000%</option>
-                            </select>
+                        <div class="form-row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="outputFormatSelect">Image format</label>
+                                    <select class="form-control" id="outputFormatSelect">
+                                        <option selected>PNG</option>
+                                        <option>JPG</option>
+                                        <option>SVG</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="outputScaleSelect">Scale</label>
+                                    <select class="form-control" id="outputScaleSelect">
+                                        <option>10%</option>
+                                        <option>25%</option>
+                                        <option>50%</option>
+                                        <option>75%</option>
+                                        <option>100%</option>
+                                        <option selected>125%</option>
+                                        <option>150%</option>
+                                        <option>200%</option>
+                                        <option>500%</option>
+                                        <option>1000%</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="autoAlignCheckbox" checked>
+                                <label class="form-check-label" for="autoAlignCheckbox">
+                                    Wrap input with <code>\begin{align*}</code> and <code>\end{align*}</code> automatically
+                                </label>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" type="button" id="convertButton">
+                            <span class="spinner-grow spinner-grow-sm d-none" role="status" aria-hidden="true" id="convertSpinner"></span>
+                            <span id="convertButtonText">Convert</span>
+                        </button>
+                        &nbsp;&nbsp;
+                        <button class="btn btn-info" type="button" id="exampleButton">
+                            Show Example
+                        </button>
                     </div>
-                    <input type='submit' class="btn btn-primary" id="convertButton" value="Convert">
-                    &nbsp;&nbsp;
-                    <input type='submit' class="btn btn-info" id="exampleButton" value="Show Example">
-                </div>
+                </form>
             </div>
         </div>
         <br>
@@ -68,7 +86,7 @@
                 <div class="card-body">
                     <img id="resultImage" />
                     <br><br>
-                    <a href="#" class="btn btn-primary" role="button" id="downloadButton" download>Save Image</a>
+                    <a href="#" class="btn btn-primary" role="button" id="downloadButton" target="_blank" download>Save Image</a>
                 </div>
             </div>
             <div class="alert alert-danger initiallyHidden" id="errorAlert"></div>
