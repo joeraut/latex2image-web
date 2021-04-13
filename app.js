@@ -97,8 +97,11 @@ conversionRouter.post('/convert', async (req, res) => {
 
     // Convert to PNG
     } else if (fileFormat === 'png') {
-      await sharp(inputSvgFileName, { density: 96 })
-        .toFile(outputFileName); // Sharp's PNG type is implicitly determined via the output file extension
+      let s = sharp(inputSvgFileName, { density: 96 });
+      if (req.body.transparentBackground === 'false') {
+        s = s.flatten({ background: { r: 255, g: 255, b: 255 } });
+      }
+      await s.toFile(outputFileName); // Sharp's PNG type is implicitly determined via the output file extension
 
     // Convert to JPG
     } else {
