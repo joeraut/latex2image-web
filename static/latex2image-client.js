@@ -31,7 +31,11 @@ $(document).ready(function() {
     $('#result').slideUp(hasShownBefore ? 330 : 0, afterSlideUp);
   }
 
-  $('#convertButton').click(function() {
+  $('#convertButton').click(convert);
+  $('form').submit(convert);
+
+  function convert(e) {
+    e.preventDefault();
     var latexInput = $('#latexInputTextArea').val();
 
     if (!latexInput) {
@@ -58,6 +62,7 @@ $(document).ready(function() {
         latexInput: latexInput,
         outputFormat: $('#outputFormatSelect').val(),
         outputScale: $('#outputScaleSelect').val(),
+        outputPadding: $('#outputPaddingNumber').val(),
         transparentBackground: $('#transparentBackgroundCheckbox').prop('checked'),
       },
       success: function(data) {
@@ -75,7 +80,7 @@ $(document).ready(function() {
         alert('Error communicating with server');
       }
     });
-  });
+  }
 
   // Show and convert a sample equation
   $('#exampleButton').click(function() {
