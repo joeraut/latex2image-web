@@ -32,7 +32,7 @@
                             <textarea class="form-control" id="latexInputTextArea" placeholder="Enter LaTeX math equation" rows="5"></textarea>
                         </div>
                         <div class="form-row">
-                            <div class="col-sm-6">
+                            <div class="col-sm-4">
                                 <div class="form-group">
                                     <label for="outputFormatSelect">Image format</label>
                                     <select class="form-control" id="outputFormatSelect">
@@ -42,7 +42,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-sm-6">
+                            <div class="col-sm-4">
                                 <div class="form-group">
                                     <label for="outputScaleSelect">Scale</label>
                                     <select class="form-control" id="outputScaleSelect">
@@ -59,12 +59,26 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="outputPaddingNumber">Padding (px)</label>
+                                    <input class="form-control" type="number" id="outputPaddingNumber" value="0" min="0" step="1">
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="autoAlignCheckbox" checked>
                                 <label class="form-check-label" for="autoAlignCheckbox">
                                     Wrap input with <code>\begin{align*}</code> and <code>\end{align*}</code> automatically
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="transparentBackgroundCheckbox" checked>
+                                <label class="form-check-label" for="transparentBackgroundCheckbox">
+                                  Transparent background (for PNG)
                                 </label>
                             </div>
                         </div>

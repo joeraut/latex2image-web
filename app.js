@@ -80,6 +80,12 @@ conversionRouter.post('/convert', async (req, res) => {
     const equation = req.body.latexInput.trim();
     const fileFormat = req.body.outputFormat.toLowerCase();
     const outputScale = scaleMap[req.body.outputScale];
+    const outputPadding = parseInt(req.body.outputPadding);
+
+    let transparentBackground = req.body.transparentBackground === 'true';
+    if (fileFormat !== 'png') {
+      transparentBackground = false;
+    }
 
     // Generate and write the .tex file
     await fsPromises.mkdir(`${tempDir}/${id}`);
@@ -91,18 +97,31 @@ conversionRouter.post('/convert', async (req, res) => {
     const inputSvgFileName = `${tempDir}/${id}/equation.svg`;
     const outputFileName = `${outputDir}/img-${id}.${fileFormat}`;
 
+    const pad = {
+      top: outputPadding,
+      bottom: outputPadding,
+      left: outputPadding,
+      right: outputPadding,
+      background: { r: 255, b: 255, g: 255, alpha: transparentBackground? 0: 1 },
+    };
+
     // Return the SVG image, no further processing required
     if (fileFormat === 'svg') {
       await fsPromises.copyFile(inputSvgFileName, outputFileName);
 
     // Convert to PNG
     } else if (fileFormat === 'png') {
-      await sharp(inputSvgFileName, { density: 96 })
-        .toFile(outputFileName); // Sharp's PNG type is implicitly determined via the output file extension
+      let s = sharp(inputSvgFileName, { density: 96 })
+        .extend(pad);
+      if (!transparentBackground) {
+        s = s.flatten({ background: { r: 255, g: 255, b: 255 } })
+      }
+      await s.toFile(outputFileName); // Sharp's PNG type is implicitly determined via the output file extension
 
     // Convert to JPG
     } else {
       await sharp(inputSvgFileName, { density: 96 })
+        .extend(pad)
         .flatten({ background: { r: 255, g: 255, b: 255 } }) // as JPG is not transparent, use a white background
         .jpeg({ quality: 95 })
         .toFile(outputFileName);
