@@ -14,7 +14,7 @@
     "express": "^4.17.1",
     "express-promise-router": "^4.0.1",
     "express-queue": "^0.0.12",
-    "sharp": "^0.27.0",
+    "sharp": "^0.30.5",
     "shelljs": "^0.8.4"
   }
 }
