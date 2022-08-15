@@ -3,6 +3,15 @@ var hasShownBefore = false;
 
 var ENDPOINT = '/convert';
 
+const copyImage = async (src) => {
+  const response = await fetch(src);
+  const blob = await response.blob();
+  await navigator.clipboard.write([
+    new ClipboardItem({"image/png": blob}),
+  ]);
+  alert("Copied!")
+}
+
 $(document).ready(function() {
   function show(resultData) {
     function afterSlideUp() {
@@ -10,6 +19,10 @@ $(document).ready(function() {
       if ((resultDataJSON = JSON.parse(resultData)) && !resultDataJSON.error) {
         $('#resultImage').attr('src', resultDataJSON.imageURL);
         $('#downloadButton').attr('href', resultDataJSON.imageURL);
+        $('#clipboardButton').off("click").on("click", (e) => {
+          e.preventDefault();
+          copyImage(resultDataJSON.imageURL);
+        })
         $('#resultCard').show();
         $('#errorAlert').hide();
       } else {
@@ -64,6 +77,7 @@ $(document).ready(function() {
         $('#exampleButton').prop('disabled', false);
         $('#convertButtonText').html('Convert');
         $('#convertSpinner').addClass('d-none');
+ 
         show(data);
       },
       error: function() {
@@ -79,7 +93,7 @@ $(document).ready(function() {
   // Show and convert a sample equation
   $('#exampleButton').click(function() {
     $('#latexInputTextArea').val(sampleEquation);
-    $('#autoAlignCheckbox').prop('checked', true);
+    // $('#autoAlignCheckbox').prop('checked', true);
     $('#convertButton').click();
   });
 });

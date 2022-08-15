@@ -86,6 +86,7 @@ conversionRouter.post('/convert', async (req, res) => {
     await fsPromises.writeFile(`${tempDir}/${id}/equation.tex`, getLatexTemplate(equation));
 
     // Run the LaTeX compiler and generate a .svg file
+    console.log(getDockerCommand(id, outputScale))
     await execAsync(getDockerCommand(id, outputScale));
 
     const inputSvgFileName = `${tempDir}/${id}/equation.svg`;
@@ -163,11 +164,12 @@ function getDockerCommand(id, output_scale) {
     timeout 5 dvisvgm --no-fonts --scale=${output_scale} --exact equation.dvi`;
 
   // Start the container in the appropriate directory and run commands within it.
+  // Default WORKDIR in blang/latex is /data
   // Files in this directory will be accessible under /data within the container.
+
   return `
-    cd ${tempDir}/${id}
-    docker run --rm -i --user="$(id -u):$(id -g)" \
-        --net=none -v "$PWD":/data "blang/latex:ubuntu" \
+    docker run --user="$(id -u):$(id -g)" \
+        --net=none -v $PWD/${tempDir}/${id}:/data "blang/latex:ubuntu" \
         /bin/bash -c "${containerCmds}"`;
 }
 
