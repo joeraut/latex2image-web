@@ -77,13 +77,22 @@ conversionRouter.post('/convert', async (req, res) => {
       return;
     }
 
+    // Define a regular expression pattern to match a 6-character string of numbers or letters.
+    const colorPattern = /^[0-9a-zA-Z]{6}$/;
+
+    if (!colorPattern.test(req.body.outputColor)) {
+      res.end(JSON.stringify({ error: 'Invalid color format. It should be a 6-character string of numbers and/or letters.' }));
+      return;
+    }
+
     const equation = req.body.latexInput.trim();
     const fileFormat = req.body.outputFormat.toLowerCase();
     const outputScale = scaleMap[req.body.outputScale];
+    const fontColor = req.body.outputColor;
 
     // Generate and write the .tex file
     await fsPromises.mkdir(`${tempDir}/${id}`);
-    await fsPromises.writeFile(`${tempDir}/${id}/equation.tex`, getLatexTemplate(equation));
+    await fsPromises.writeFile(`${tempDir}/${id}/equation.tex`, getLatexTemplate(equation, fontColor));
 
     // Run the LaTeX compiler and generate a .svg file
     await execAsync(getDockerCommand(id, outputScale));
@@ -133,7 +142,7 @@ app.listen(port, () => console.log(`Latex2Image listening at http://localhost:${
 //// Helper functions
 
 // Get the LaTeX document template for the requested equation
-function getLatexTemplate(equation) {
+function getLatexTemplate(equation, fontColor) {
   return `
     \\documentclass[12pt]{article}
     \\usepackage{amsmath}
@@ -143,8 +152,12 @@ function getLatexTemplate(equation) {
     \\usepackage{siunitx}
     \\usepackage[utf8]{inputenc}
     \\thispagestyle{empty}
+    \\definecolor{mycolor}{HTML}{${fontColor}}
     \\begin{document}
+    \{
+    \\color{mycolor}  
     ${equation}
+    \}
     \\end{document}`;
 }
 

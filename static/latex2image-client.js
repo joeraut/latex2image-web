@@ -57,7 +57,8 @@ $(document).ready(function() {
       data: {
         latexInput: latexInput,
         outputFormat: $('#outputFormatSelect').val(),
-        outputScale: $('#outputScaleSelect').val()
+        outputScale: $('#outputScaleSelect').val(),
+        outputColor: $('#outputColorSelect').val()
       },
       success: function(data) {
         $('#convertButton').prop('disabled', false);
